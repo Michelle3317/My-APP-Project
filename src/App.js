@@ -12,23 +12,33 @@ function App() {
   const [cart, setCart] = useState([]);
 
   function addItemToCart(book) {
-      setCart([...cart, book])
+    const dupeItem = cart.find((item) => item.id === book.id);
+    setCart((oldCart) =>
+      dupeItem
+        ? [
+            ...oldCart.map((item) => {
+              return item.id === dupeItem.id
+                ? {
+                    ...item,
+                    quantity: item.quantity + 1,
+                  }
+                : item;
+            }),
+          ]
+        : [...oldCart, { ...book, quantity: 1 }]
+    );
   }
 
-  useEffect(() => {
-    console.log(cart);
-  }, [cart])
- 
   function updateCart(item, newQuantity) {
-    setCart((cart) =>
-      cart.map((Item) => {
-        if (Item.id === item.id) {
+    setCart((oldCart) =>
+      oldCart.map((oldItem) => {
+        if (oldItem.id === item.id) {
           return {
-            ...Item,
+            ...oldItem,
             quantity: newQuantity,
           };
         } else {
-          return Item;
+          return oldItem;
         }
       })
     );
@@ -46,7 +56,14 @@ function App() {
     return counter;
   }
 
-  
+  function numberOfItems() {
+    let counter = 0;
+    cart.forEach((item) => {
+      counter += +item.quantity;
+    });
+    return counter;
+  }
+
   function calcPrices() {
     let total = 0;
     cart.forEach((item) => {
@@ -58,6 +75,7 @@ function App() {
       total,
     };
   }
+
   return (
     <Router>
       <div className="App">
